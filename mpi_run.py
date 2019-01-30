@@ -2,9 +2,10 @@ from mpi4py import MPI
 import numpy as np
 from multiprocessing import Pool, cpu_count
 from itertools import product
+from dotCavity import main # Import main function
 
-def main(x, y):
-    return x + y
+# def main(x, y):
+#     return x + y
 
 def split(rank, size, *data):
 
@@ -13,18 +14,25 @@ def split(rank, size, *data):
     partitions = [int(len(d) / size) for d in data]
     return [d[rank * partition:(rank + 1) * partition] for partition, d in zip(partitions, data)]
 
-def parallel_apply(x, y):
+def parallel_apply(*data):
 
     """Feed parameters into function."""
 
     p = Pool(processes=cpu_count())
-    return p.starmap(main, product(x, y))
+    return p.starmap(main, product(*data))
 
 
 # MPI setup
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank() # Identification number of node
 size = comm.Get_size() # Number of nodes
+
+
+
+
+
+
+
 
 # Define data matrix
 n_x, n_y = 8, 8
