@@ -86,8 +86,8 @@ def main(epsImp, epsCav):
     R = groundState.M[int(length_new / 2)]
 
     # Michael's stuff
-    L = np.einsum('ijk,ilm->jlkm',L,L.conj())
-    R = np.einsum('ijk,lmk->iljm',R,R.conj())
+    L = np.einsum('ijk,ilm->jlkm', L, L.conj())
+    R = np.einsum('ijk,lmk->iljm', R, R.conj())
 
     dens = np.einsum('ijkl,klmn->imjn',L,R)
     dummySize = dens.shape[0] * dens.shape[1]
@@ -106,3 +106,44 @@ def main(epsImp, epsCav):
 
 def test(x, y):
     return x + y, x * y
+
+def test_2(epsImp, epsCav):
+
+    # define the simulation parameters
+    D = 4
+    d = 4
+    Lambda = 2.0
+    length = 3
+    U = 0.5
+
+    # setting up the Hamiltonian in MPO from
+    c = bathCouplings(density='const', N=length, Lambda=Lambda)
+    mpo = dotCavity(tL=0.05, tR=0.05, tBathLeft=c.t, tBathRight=c.t, omega=0.025, epsDot=epsImp, epsCav=epsCav,
+                    epsBathLeft=c.eps, epsBathRight=c.eps, U=U)
+    H = MPS.MPO(numberOfSites=len(mpo.Hamiltonian), bondDimension=6, localHilbertSpace=4, maximalBondDimension=D,
+                thresholdEntanglement=0., periodic=False)
+    H.M = copy.deepcopy([np.transpose(h, (0, 2, 3, 1)) for h in mpo.Hamiltonian])
+    H.structuredPhysicalLegs = True
+    groundState = MPS.mpsDMRG(H, bondDimension=D, thresholdEntanglement=1e-6)
+    groundState.groundState(sweeps=5)
+
+    length_new = len(groundState.M)
+
+    groundState.makeCanonical('Right')
+    groundState.moveGauge(int(length_new / 2), False, False)
+
+    L = groundState.M[int(length_new / 2) - 1]
+    R = groundState.M[int(length_new / 2)]
+
+    # Michael's stuff
+    L = np.einsum('ijk,ilm->jlkm', L, L.conj())
+    R = np.einsum('ijk,lmk->iljm', R, R.conj())
+
+    dens = np.einsum('ijkl,klmn->imjn',L,R)
+    dummySize = dens.shape[0] * dens.shape[1]
+    dens = np.reshape(dens,(dummySize, dummySize))
+
+
+    purity = np.real(np.trace(dens @ dens))
+
+    return purity, 0
