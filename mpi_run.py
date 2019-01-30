@@ -1,7 +1,17 @@
 from mpi4py import MPI
-from multiprocessing import Pool, cpu_count, set_start_method
+from multiprocessing import Pool, cpu_count
 from itertools import product
-from dotCavity import main, test
+from dotCavity import dmrg, test
+
+
+if dmrg == False:
+
+    main = dmrg
+
+else:
+
+    main = test
+
 
 
 def split(rank, size, *data):
@@ -16,7 +26,7 @@ def parallel_apply(data):
     """Feed parameters into function."""
 
     p = Pool(processes=cpu_count())
-    return p.starmap(test, product(*data))
+    return p.starmap(main, product(*data))
 
 
 # MPI setup
@@ -27,7 +37,7 @@ size = comm.Get_size() # Number of nodes
 
 # Define simulation parameters
 n_x, n_y = 16, 16
-data_x, data_y = list(range(n_x)), list(range(n_y))
+data_x, data_y = range(n_x), range(n_y)
 
 
 # Split the data for the nodes and apply the function to every node
@@ -38,14 +48,12 @@ result = parallel_apply(data)
 result = comm.gather(result, root=0)
 data = comm.gather(data, root=0)
 
-
 # Save the results in a text file
 if rank == 0:
 
     f = open("output_file.txt", "w")
 
     for res, dat in zip(result, data):
-
         for res_i, dat_i in zip(res, product(*dat)):
             f.write(' '.join(map(str, dat_i)) + " " + ' '.join(map(str, res_i)) + '\n')
 
