@@ -1,1 +1,1 @@
-from .dot_cav_full_info import main
+from .dot_cav_full_info import *

@@ -1,20 +1,23 @@
-import sys
-sys.path.insert(0, '..')
 from MatrixProductOperators import dotCavity, bathCouplings
 import MPSModule as MPS
 import copy
 import numpy as np
 
 
-# define the simulation parameters
-D = 5
-d = 4
-Lambda = 2.0
-length = 20
-U = 0.5
-
-
 def main(epsImp, epsCav):
+
+    # global D
+    # global d
+    # global Lambda
+    # global length
+    # global U
+
+    # define the simulation parameters
+    D = 4
+    d = 4
+    Lambda = 2.0
+    length = 3
+    U = 0.5
 
     # setting up the Hamiltonian in MPO from
     c = bathCouplings(density='const', N=length, Lambda=Lambda)
@@ -101,17 +104,5 @@ def main(epsImp, epsCav):
 
     return correlation, purity, total_occ, dot_occ, cav_occ
 
-
-# if __name__ == '__main__':
-#
-#     epsDot = float(sys.argv[1])
-#
-#     epsCav = float(sys.argv[2])
-#
-#     correlation, purity, total_occ, dot_occ, cav_occ = main(epsDot, epsCav)
-#
-#     f = open("correlation_purity_occupation.txt", "a")
-#     f.write(str(epsDot) + " " + str(epsCav) + " " + str(correlation) + " " + str(purity) + " " + str(total_occ) + " " + str(dot_occ) + " " + str(cav_occ) + "\n")
-#     f.close()
-
-
+def test(x, y):
+    return x + y, x * y
