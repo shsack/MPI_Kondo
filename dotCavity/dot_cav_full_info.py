@@ -21,11 +21,9 @@ def dmrg(epsImp, epsCav):
               thresholdEntanglement=0., periodic=False)
     H.M = copy.deepcopy([np.transpose(h, (0, 2, 3, 1)) for h in mpo.Hamiltonian])
     H.structuredPhysicalLegs = True
+
     groundState = MPS.mpsDMRG(H, bondDimension=D, thresholdEntanglement=1e-6)
-
-
     groundState.groundState(sweeps=1)
-
 
     length_new = len(groundState.M)
 
@@ -101,6 +99,7 @@ def dmrg(epsImp, epsCav):
 
     # return correlation, purity, total_occ, dot_occ, cav_occ
 
+    return purity, 0
 
 def test(x, y):
 
