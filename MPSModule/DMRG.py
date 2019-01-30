@@ -7,7 +7,6 @@ import time
 import numpy as np
 import scipy.sparse as sparse
 
-print('test')
 
 def contract_from_right(W, A, F, B):
     # TODO docstring
