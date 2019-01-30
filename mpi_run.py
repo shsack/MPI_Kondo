@@ -4,16 +4,6 @@ from itertools import product
 from dotCavity import dmrg, test
 
 
-if dmrg == False:
-
-    main = dmrg
-
-else:
-
-    main = test
-
-
-
 def split(rank, size, *data):
 
     """Split the data into chunks"""
@@ -26,7 +16,11 @@ def parallel_apply(data):
     """Feed parameters into function."""
 
     p = Pool(processes=cpu_count())
-    return p.starmap(main, product(*data))
+    result = p.starmap(dmrg, product(*data))
+    p.close()  # shut down the pool
+    p.join()
+
+    return result
 
 
 # MPI setup

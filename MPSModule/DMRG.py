@@ -7,6 +7,7 @@ import time
 import numpy as np
 import scipy.sparse as sparse
 
+print('test')
 
 def contract_from_right(W, A, F, B):
     # TODO docstring
@@ -224,7 +225,6 @@ class mpsDMRG(MPS):
         self.Renv = self.construct_right_env()
 
         for sweep in range(sweeps):
-            # t0 = time.time()
             for i in range(0, self.L - 1):
                 self.optimizeOneSite()
                 self.moveGauge(1, True, True)
@@ -241,13 +241,8 @@ class mpsDMRG(MPS):
                 self.indexOrderInplace('DdD')
                 self.Lenv.pop()
 
-            # t1 = time.time()
-            # print(t1 - t0)
-            # print(self)
-            # print(self.measure(self.MPO)/(self.L-1))
-
-            # print(f'single site... sweep: {sweep}  energy: {self.measure(self.MPO)} \t  var: {self.var(self.MPO)}')
         return
+
 
     def groundState(self, sweeps):
 
