@@ -1,7 +1,7 @@
 import numpy as np
-from MPSModule.MatrixProducts import MPS, MPO
+from _.MatrixProducts import MPS, MPO
 from qutip import sigmam, sigmap
-from MPSModule.TEBD import TEBDstep, measure, measureDensityMatrix, traceMPO, truncate
+from _.TEBD import TEBDstep, measure, measureDensityMatrix, traceMPO, truncate
 import copy
 
 def initializePure(localHilbertSpace, maximalBondDimension, coefficients, truncate = False):

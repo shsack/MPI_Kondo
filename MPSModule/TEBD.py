@@ -1,5 +1,5 @@
 import numpy as np
-from MPSModule.MatrixProducts import MPO, MPS
+from _.MatrixProducts import MPO, MPS
 from qutip import sigmap, sigmam, sigmaz
 from scipy.linalg import expm
 from scipy.optimize import curve_fit
