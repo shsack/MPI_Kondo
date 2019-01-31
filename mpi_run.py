@@ -17,18 +17,21 @@ def apply_main_in_node(data):
 
     """Feed parameters into function."""
 
-    # p = Pool(processes=1)
+    # p = Pool(processes=2)
     # result = p.starmap(main, data)
-    # return result
+    #
     # p.close()  # shut down the pool
     # p.join()
+    #
+    # return result
+
 
     # result = Parallel(n_jobs=4)(delayed(dmrg)(*i) for i in product(*data))
     # return result
 
     # jobs = []
     # for d in product(*data):
-    #     p = mp.Process(target=main, args=(*d,))
+    #     p = Process(target=main, args=(*d,))
     #     jobs.append(p)
     #     p.start()
     #
@@ -48,7 +51,7 @@ size = comm.Get_size() # Number of nodes
 
 
 # Define simulation parameters
-num_data_points = 4 # !!! Has to be a multiple of the requested nodes !!! <---- IMPORTANT
+num_data_points = 40 # !!! Has to be a multiple of the requested nodes !!! <---- IMPORTANT
 epsImp = np.linspace(-1./16, 0.5/16, num_data_points)
 epsCav = np.linspace(-0.5/16, 0.5/16, num_data_points)
 data = list(product(epsImp, epsCav))
@@ -64,21 +67,29 @@ else :
     data_split = None
 
 
+# data_split = split_data(size, data)
+
+
 # Scatter data from zeroth node onto other nodes and do the calculation in each node
 data_in_node = comm.scatter(data_split, root=0)
 result = apply_main_in_node(data_in_node)
 
+
 # Combine the results from the nodes
 result = comm.gather(result, root=0)
+
 
 # Save the results in a text file
 if rank == 0:
 
     f = open("output_file.txt", "w")
 
-    for res, dat in zip(result, data):
-        for res_i, dat_i in zip(res, product(*dat)):
-            f.write(' '.join(map(str, dat_i)) + " " + ' '.join(map(str, res_i)) + '\n')
+    myRes = []
+    for res in result:
+        for res_i in res:
+            myRes.append(res_i)
+    for dat_, res_ in zip(data, myRes):
+        f.write(' '.join(map(str, dat_)) + " " + ' '.join(map(str, res_)) + '\n')
 
     f.close()
 
