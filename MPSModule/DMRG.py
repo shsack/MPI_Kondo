@@ -71,6 +71,8 @@ def optimizeSingleSiteSparse(L, R, W, M, k = 1, mode ='sparse'):
     # define the linear operator to be diagonalized, this is faster than actually storing the matrix
     H = sparse.linalg.LinearOperator((dim, dim), matvec, dtype=np.complex128)
 
+    # FIXME: mp gets stuck here
+
     # solve the eigenvalue problem while using the current MPS at site as an initial guess for the eigenvector
 
     return sparse.linalg.eigsh(H, k=k, which='SA', v0=np.reshape(M, -1) )
