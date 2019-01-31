@@ -1,8 +1,7 @@
 from mpi4py import MPI
-from multiprocessing import Pool, cpu_count
+# from multiprocessing import Pool, cpu_count
 from itertools import product
-from dotCavity import dmrg, test
-
+from dotCavity import dmrg
 
 def split(rank, size, *data):
 
@@ -11,16 +10,25 @@ def split(rank, size, *data):
     partitions = [int(len(d) / size) for d in data]
     return [d[rank * partition:(rank + 1) * partition] for partition, d in zip(partitions, data)]
 
+
 def parallel_apply(data):
 
     """Feed parameters into function."""
 
-    p = Pool(processes=cpu_count())
-    result = p.starmap(dmrg, product(*data))
-    p.close()  # shut down the pool
-    p.join()
+    #TODO: put for loop!
+
+    # p = Pool(processes=1)
+    # result = p.starmap(dmrg, product(*data))
+    # p.close()  # shut down the pool
+    # p.join()
+
+    result = []
+    for d in product(*data):
+        result.append(dmrg(*d))
 
     return result
+
+    # return result
 
 
 # MPI setup
@@ -37,6 +45,7 @@ data_x, data_y = range(n_x), range(n_y)
 # Split the data for the nodes and apply the function to every node
 data = split(rank, size, data_x, data_y)
 result = parallel_apply(data)
+
 
 # Combine the results from the nodes
 result = comm.gather(result, root=0)
