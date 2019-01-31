@@ -1,7 +1,9 @@
 from mpi4py import MPI
 # from multiprocessing import Pool, cpu_count
 from itertools import product
-from dotCavity import dmrg
+from dotCavity import dmrg as main
+import numpy as np
+# from joblib import Parallel, delayed
 
 def split(rank, size, *data):
 
@@ -24,10 +26,11 @@ def parallel_apply(data):
 
     result = []
     for d in product(*data):
-        result.append(dmrg(*d))
+        result.append(main(*d))
 
     return result
 
+    # result = Parallel(n_jobs=4)(delayed(dmrg)(*i) for i in product(*data))
     # return result
 
 
@@ -38,12 +41,12 @@ size = comm.Get_size() # Number of nodes
 
 
 # Define simulation parameters
-n_x, n_y = 16, 16
-data_x, data_y = range(n_x), range(n_y)
+epsImp = np.linspace(-1./16, 0.5/16, 50)
+epsCav = np.linspace(-0.5/16, 0.5/16, 50)
 
 
 # Split the data for the nodes and apply the function to every node
-data = split(rank, size, data_x, data_y)
+data = split(rank, size, epsImp, epsCav)
 result = parallel_apply(data)
 
 
