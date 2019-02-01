@@ -26,6 +26,8 @@ def import_main_data(which_simulation):
         D = range(10, 70)
         main = partial(main, V=V)
 
+        # TODO: DOES NOT YET WORK
+
         return D, main
 
     if which_simulation == 'purity_V':
@@ -34,6 +36,8 @@ def import_main_data(which_simulation):
         D = [20, 50, 80, 110, 140, 170, 200]
         V = np.linspace(start=0.0, stop=0.5, num=50)
         data = product(D, V)
+
+        # TODO: DOES NOT YET WORK
 
         return data, main
 
