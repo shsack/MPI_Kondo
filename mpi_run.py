@@ -1,6 +1,9 @@
 from mpi4py import MPI
 from run_settings import import_main_data
-simulation_name = 'dot_cav_purity_heatmap'
+
+# Choose the simulation you want to run
+simulation_list = ['dot_cav_purity_heatmap', 'purity_entropy_D', 'purity_V']
+simulation_name = simulation_list[0]
 data, main = import_main_data(which_simulation=simulation_name)
 
 
