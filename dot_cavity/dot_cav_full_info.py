@@ -4,7 +4,7 @@ import copy
 import numpy as np
 
 
-def dmrg(epsImp, epsCav, D):
+def main(epsImp, epsCav, D):
 
 
     # define the simulation parameters
