@@ -18,10 +18,11 @@ main(0, 0)
 stop = time.time()
 
 # Evaluate time (in sec) and memory usage (in MB)
-time_for_call = stop - start
-memory_used = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024 ** 2
-print('Call of main took {0:.2f} seconds.'.format(time_for_call))
-print('The maximum memory usage was {0:.2f} MB.'.format(memory_used))
+if rank == 0:
+    time_for_call = stop - start
+    memory_used = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024 ** 2
+    print('Call of main took {0:.2f} seconds.'.format(time_for_call))
+    print('The maximum memory usage was {0:.2f} MB.'.format(memory_used))
 
 
 
