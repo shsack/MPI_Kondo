@@ -1,8 +1,7 @@
 from mpi4py import MPI
-from itertools import product
-from dot_cavity import dmrg as main
-import numpy as np
-from functools import partial
+from run_settings import import_main_data
+simulation_name = 'dot_cav_purity_heatmap'
+data, main = import_main_data(which_simulation=simulation_name)
 
 
 def split_data(size, data):
@@ -21,13 +20,6 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()  # Identification number of node
 size = comm.Get_size()  # Number of nodes
 
-# Define simulation parameters
-num_data_points = 4  # !!! Has to be a multiple of the requested nodes !!! <---- IMPORTANT
-epsImp = np.linspace(-1./16, 0.5/16, num_data_points)
-epsCav = np.linspace(-0.5/16, 0.5/16, num_data_points)
-data = list(product(epsImp, epsCav))
-D = 10
-main = partial(main, D=D)
 
 # Split the data in the zeroth node
 if rank == 0:
@@ -45,7 +37,7 @@ result = comm.gather(result, root=0)
 # Save the results in a text file
 if rank == 0:
 
-    f = open("simulation_results/dot_cav_D_{}.txt".format(D), "w")
+    f = open("simulation_results/{}.txt".format(simulation_name), "w")
 
     myRes = []
     for res in result:
