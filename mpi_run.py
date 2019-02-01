@@ -2,6 +2,7 @@ from mpi4py import MPI
 from itertools import product
 from dotCavity import dmrg as main
 import numpy as np
+from functools import partial
 # from joblib import Parallel, delayed
 # import multiprocessing as mp
 # import time
@@ -50,11 +51,12 @@ size = comm.Get_size()  # Number of nodes
 
 
 # Define simulation parameters
-num_data_points = 40  # !!! Has to be a multiple of the requested nodes !!! <---- IMPORTANT
+num_data_points = 4  # !!! Has to be a multiple of the requested nodes !!! <---- IMPORTANT
 epsImp = np.linspace(-1./16, 0.5/16, num_data_points)
 epsCav = np.linspace(-0.5/16, 0.5/16, num_data_points)
 data = list(product(epsImp, epsCav))
-
+D = 10
+main = partial(main, D=D)
 
 # Split the data in the zeroth node
 if rank == 0:

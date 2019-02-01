@@ -2,6 +2,7 @@ from dotCavity import dmrg as main
 from mpi4py import MPI
 import time
 import resource
+import sys
 
 # Start the timer
 start = time.time()
@@ -12,12 +13,13 @@ rank = comm.Get_rank()  # Identification number of node
 size = comm.Get_size()  # Number of nodes
 
 # Calling main for timing and memory usage
-main(0, 0)
+D = int(sys.argv[1])
+main(0, 0, D)
 
 # Stop the timer
 stop = time.time()
 
-# Evaluate time (in sec) and memory usage (in MB)
+# Evaluate time (in sec) and memory usage (in MB) in rank 0
 if rank == 0:
     time_for_call = stop - start
     memory_used = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024 ** 2
