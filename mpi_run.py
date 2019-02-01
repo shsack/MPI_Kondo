@@ -4,6 +4,11 @@ from dotCavity import dmrg as main
 import numpy as np
 # from joblib import Parallel, delayed
 # import multiprocessing as mp
+# import time
+# from multiprocessing import cpu_count
+# import os
+# import multiprocessing as mp
+# mp.set_start_method('spawn')
 
 
 def split_data(size, data):
@@ -12,21 +17,19 @@ def split_data(size, data):
     return [data[i:i + n] for i in range(0, len(data), n)]
 
 
-
 def apply_main_in_node(data):
 
     """Feed parameters into function."""
 
-    # p = Pool(processes=2)
-    # result = p.starmap(main, data)
-    #
+    # p = Pool(processes=1)
+    # result = map(main, data[0])
+
     # p.close()  # shut down the pool
     # p.join()
-    #
+
     # return result
 
-
-    # result = Parallel(n_jobs=4)(delayed(dmrg)(*i) for i in product(*data))
+    # result = Parallel(n_jobs=2)(delayed(main)(*i) for i in product(data))
     # return result
 
     # jobs = []
@@ -37,21 +40,17 @@ def apply_main_in_node(data):
     #
     # return jobs
 
-    result = []
-    for d in data:
-        result.append(main(*d))
-
-    return result
+    return [main(*d) for d in data]
 
 
 # MPI setup
 comm = MPI.COMM_WORLD
-rank = comm.Get_rank() # Identification number of node
-size = comm.Get_size() # Number of nodes
+rank = comm.Get_rank()  # Identification number of node
+size = comm.Get_size()  # Number of nodes
 
 
 # Define simulation parameters
-num_data_points = 40 # !!! Has to be a multiple of the requested nodes !!! <---- IMPORTANT
+num_data_points = 40  # !!! Has to be a multiple of the requested nodes !!! <---- IMPORTANT
 epsImp = np.linspace(-1./16, 0.5/16, num_data_points)
 epsCav = np.linspace(-0.5/16, 0.5/16, num_data_points)
 data = list(product(epsImp, epsCav))
@@ -59,25 +58,16 @@ data = list(product(epsImp, epsCav))
 
 # Split the data in the zeroth node
 if rank == 0:
-
     data_split = split_data(size, data)
-
-else :
-
+else:
     data_split = None
-
-
-# data_split = split_data(size, data)
-
 
 # Scatter data from zeroth node onto other nodes and do the calculation in each node
 data_in_node = comm.scatter(data_split, root=0)
 result = apply_main_in_node(data_in_node)
 
-
 # Combine the results from the nodes
 result = comm.gather(result, root=0)
-
 
 # Save the results in a text file
 if rank == 0:
