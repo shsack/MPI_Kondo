@@ -7,8 +7,7 @@ sns.set()
 plt.style.use('bmh')
 
 # File to import
-D = 10
-file = 'simulation_results/dot_cav_purity_heatmap.txt'.format(D)
+file = 'simulation_results/dot_cav_purity_heatmap.txt'
 
 data = pd.read_csv(file, delimiter=' ', header=None, dtype=float)
 epsImp = list(data[data.columns[0]])
@@ -28,4 +27,4 @@ cbar.set_label(r'$\langle n_{d\uparrow} + n_{d\downarrow} \rangle$')
 plt.xlabel(r'$\epsilon_d$')
 plt.ylabel(r'$\epsilon_c$')
 fig = plt.gcf()
-fig.savefig('plots/dot_cav_heatmap_D_{}.pdf'.format(D))
+fig.savefig('plots/dot_cav_heatmap.pdf')
