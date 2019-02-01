@@ -7,7 +7,7 @@ def import_main_data(which_simulation):
 
     if which_simulation == 'dot_cav_purity_heatmap':
 
-        from dot_cavity import main
+        from dot_cavity.dot_cav_full_info import main
 
         D = 10
         num_data_points = 4  # !!! Has to be a multiple of the requested nodes !!! <---- IMPORTANT
