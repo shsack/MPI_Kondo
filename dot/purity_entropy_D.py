@@ -19,10 +19,10 @@ def setup(epsImp, U, V, Lambda,length, D, sweeps):
     return groundState
 
 
-def main(epsImp, D):
+def main(V, D):
 
     U = 0.5
-    V = 0.075
+    epsImp = U/2
     Lambda = 2.0
     length = 20
     sweeps = 10
