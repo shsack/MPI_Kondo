@@ -13,4 +13,4 @@ Choose the simulation you want to run inside of **mpi_run.py**
 
 ## Check
 
-You can check the time and memory usage for one data point **check_mem_time.py**.
+You can check the time and memory usage for one data point with **check_mem_time.py**.
