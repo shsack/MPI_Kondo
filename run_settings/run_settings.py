@@ -9,10 +9,10 @@ def import_main_data(which_simulation):
 
         from dot_cavity.dot_cav_full_info import main
 
-        D = 10
-        num_data_points = 4  # !!! Has to be a multiple of the requested nodes !!! <---- IMPORTANT
-        epsImp = np.linspace(-1. / 16, 0.5 / 16, num_data_points)
-        epsCav = np.linspace(-0.5 / 16, 0.5 / 16, num_data_points)
+        D = 40
+        num_data_points = 72  # !!! Has to be a multiple of the requested nodes !!! <---- IMPORTANT
+        epsImp = np.linspace(-1., 0.5, num_data_points)
+        epsCav = np.linspace(-0.5, 0.5, num_data_points)
         data = list(product(epsImp, epsCav))
         main = partial(main, D=D)
 
