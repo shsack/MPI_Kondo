@@ -1,14 +1,10 @@
 from mpi4py import MPI
-from itertools import product
-from dotCavity import dmrg as main
-import numpy as np
-# from joblib import Parallel, delayed
-# import multiprocessing as mp
-# import time
-# from multiprocessing import cpu_count
-# import os
-# import multiprocessing as mp
-# mp.set_start_method('spawn')
+from run_settings import import_main_data
+
+# Choose the simulation you want to run
+simulation_list = ['dot_cav_purity_heatmap', 'purity_entropy_D', 'purity_V']
+simulation_name = simulation_list[0]
+data, main = import_main_data(which_simulation=simulation_name)
 
 
 def split_data(size, data):
@@ -19,27 +15,6 @@ def split_data(size, data):
 
 def apply_main_in_node(data):
 
-    """Feed parameters into function."""
-
-    # p = Pool(processes=1)
-    # result = map(main, data[0])
-
-    # p.close()  # shut down the pool
-    # p.join()
-
-    # return result
-
-    # result = Parallel(n_jobs=2)(delayed(main)(*i) for i in product(data))
-    # return result
-
-    # jobs = []
-    # for d in product(*data):
-    #     p = Process(target=main, args=(*d,))
-    #     jobs.append(p)
-    #     p.start()
-    #
-    # return jobs
-
     return [main(*d) for d in data]
 
 
@@ -47,13 +22,6 @@ def apply_main_in_node(data):
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()  # Identification number of node
 size = comm.Get_size()  # Number of nodes
-
-
-# Define simulation parameters
-num_data_points = 40  # !!! Has to be a multiple of the requested nodes !!! <---- IMPORTANT
-epsImp = np.linspace(-1./16, 0.5/16, num_data_points)
-epsCav = np.linspace(-0.5/16, 0.5/16, num_data_points)
-data = list(product(epsImp, epsCav))
 
 
 # Split the data in the zeroth node
@@ -72,7 +40,7 @@ result = comm.gather(result, root=0)
 # Save the results in a text file
 if rank == 0:
 
-    f = open("output_file.txt", "w")
+    f = open("simulation_results/{}.txt".format(simulation_name), "w")
 
     myRes = []
     for res in result:
