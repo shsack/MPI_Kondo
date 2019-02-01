@@ -7,6 +7,7 @@ import time
 import numpy as np
 import scipy.sparse as sparse
 
+import sys
 
 def contract_from_right(W, A, F, B):
     # TODO docstring
@@ -40,7 +41,7 @@ def contract_from_left(W, A, E, B):
     tmp = np.tensordot(tmp, W, axes=((0, 2), (2, 0)))
     return np.transpose(np.tensordot(tmp, B.conj(), axes=((1, 3), (1, 0))), axes=(1, 0, 2))
 
-def optimizeSingleSiteSparse(L, R, W, M, k = 1, mode ='sparse'):
+def optimizeSingleSiteSparse(L, R, W, M, k = 1):
     # TODO docstring
     """
     optimizes the MPS at one site and returns it without proper SVD procedure
@@ -52,8 +53,6 @@ def optimizeSingleSiteSparse(L, R, W, M, k = 1, mode ='sparse'):
     :param mode:
     :return:
     """
-
-    # TODO: cythonize this, probably not!!!
 
     dim = M.shape[0] * M.shape[1] * M.shape[2]
 
@@ -68,14 +67,18 @@ def optimizeSingleSiteSparse(L, R, W, M, k = 1, mode ='sparse'):
 
         return np.reshape(v, -1)
 
+
     # define the linear operator to be diagonalized, this is faster than actually storing the matrix
     H = sparse.linalg.LinearOperator((dim, dim), matvec, dtype=np.complex128)
 
-    # FIXME: mp gets stuck here
 
     # solve the eigenvalue problem while using the current MPS at site as an initial guess for the eigenvector
 
-    return sparse.linalg.eigsh(H, k=k, which='SA', v0=np.reshape(M, -1) )
+    a = sparse.linalg.eigsh(H, k=k, which='SA', v0=np.reshape(M, -1))
+
+    # FIXME: mp gets stuck here
+
+    return a
 
 
 class mpsDMRG(MPS):

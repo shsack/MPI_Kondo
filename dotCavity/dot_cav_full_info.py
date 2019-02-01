@@ -6,11 +6,12 @@ import numpy as np
 
 def dmrg(epsImp, epsCav):
 
+
     # define the simulation parameters
-    D = 40
+    D = 5
     d = 4
     Lambda = 2.0
-    length = 20
+    length = 5
     U = 0.5
     omega = 0.025
     tL, tR = 0.05, 0.05
