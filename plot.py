@@ -7,13 +7,14 @@ sns.set()
 plt.style.use('bmh')
 
 # File to import
-file = 'dot_occupation_purity_high_bond.txt'
+D = 10
+file = 'simulation_results/dot_cav_D_{}.txt'.format(D)
 
 data = pd.read_csv(file, delimiter=' ', header=None, dtype=float)
 epsImp = list(data[data.columns[0]])
 epsCav = list(data[data.columns[1]])
 
-# Choose the observable as a column of the txt file
+# Choose the observable as a column of the text file
 num_obs = 3
 observable = list(data[data.columns[num_obs]])
 
@@ -29,4 +30,4 @@ cbar.set_label(r'$\langle n_{d\uparrow} + n_{d\downarrow} \rangle$')
 plt.xlabel(r'$\epsilon_d$')
 plt.ylabel(r'$\epsilon_c$')
 fig = plt.gcf()
-fig.savefig('heatmap.pdf')
+fig.savefig('plots/heatmap_D_{}.pdf'.format(D))

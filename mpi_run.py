@@ -74,7 +74,7 @@ result = comm.gather(result, root=0)
 # Save the results in a text file
 if rank == 0:
 
-    f = open("output_file.txt", "w")
+    f = open("simulation_results/dot_cav_D_{}.txt".format(D), "w")
 
     myRes = []
     for res in result:
