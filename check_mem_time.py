@@ -1,8 +1,10 @@
-from dotCavity import dmrg as main
 from mpi4py import MPI
 import time
 import resource
 import sys
+from run_settings import import_main_data
+simulation_name = 'dot_cav_purity_heatmap'
+_, main = import_main_data(which_simulation=simulation_name)
 
 # Start the timer
 start = time.time()
@@ -13,8 +15,7 @@ rank = comm.Get_rank()  # Identification number of node
 size = comm.Get_size()  # Number of nodes
 
 # Calling main for timing and memory usage
-D = int(sys.argv[1])
-main(0, 0, D)
+main(0, 0)
 
 # Stop the timer
 stop = time.time()
