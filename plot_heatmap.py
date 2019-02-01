@@ -8,7 +8,7 @@ plt.style.use('bmh')
 
 # File to import
 D = 10
-file = 'simulation_results/dot_cav_D_{}.txt'.format(D)
+file = 'simulation_results/dot_cav_purity_heatmap.txt'.format(D)
 
 data = pd.read_csv(file, delimiter=' ', header=None, dtype=float)
 epsImp = list(data[data.columns[0]])
@@ -19,10 +19,8 @@ num_obs = 3
 observable = list(data[data.columns[num_obs]])
 
 data = data.pivot(index=0, columns=1, values=2).T
-
 extent = [min(epsImp), max(epsImp), min(epsCav), max(epsCav)]
 plt.imshow(data, origin='lower', aspect=1.5, extent=extent)
-# plt.imshow(data, origin='lower', aspect=1./1.5, extent=extent, vmin=0, vmax=2)
 
 # Label depending of which observable is plotted
 cbar = plt.colorbar()
