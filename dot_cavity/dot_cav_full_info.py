@@ -84,7 +84,7 @@ def main(epsImp, epsCav, D):
     cav_up.d = [d] * length_new
     cav_up.structuredPhysicalLegs = True
 
-    cav_down =  MPS.MPO(numberOfSites=length_new, bondDimension=1, localHilbertSpace=d, maximalBondDimension=D,
+    cav_down = MPS.MPO(numberOfSites=length_new, bondDimension=1, localHilbertSpace=d, maximalBondDimension=D,
                       thresholdEntanglement=0., periodic=False)
     cav_down.M = copy.deepcopy([np.transpose(h, (0, 2, 3, 1)) for h in mpo.n_cav_down])
     cav_down.d = [d] * length_new
@@ -120,13 +120,13 @@ def main(epsImp, epsCav, D):
     reduced_density_contracted = contract_in(density=reduced_density)
     purity = np.real(np.trace(reduced_density_contracted @ reduced_density_contracted))
 
-
-    groundState.makeCanonical('Right')
-    groundState.moveGauge(int(length_new / 2), False, False)
-
-    L = groundState.M[int(length_new / 2) - 1]
-    R = groundState.M[int(length_new / 2)]
-
+    #
+    # groundState.makeCanonical('Right')
+    # groundState.moveGauge(int(length_new / 2), False, False)
+    #
+    # L = groundState.M[int(length_new / 2) - 1]
+    # R = groundState.M[int(length_new / 2)]
+    #
 
 
     # Michael's stuff
@@ -147,7 +147,7 @@ def main(epsImp, epsCav, D):
 
 
     # Calculate the observables
-    purity = np.real(np.trace(dens @ dens))
+    # purity = np.real(np.trace(dens @ dens))
     dot_occ = np.real(groundState.conjugate() * (dot_up + dot_down) * groundState)
     cav_occ = np.real(groundState.conjugate() * (cav_up + cav_down) * groundState)
     total_occ = dot_occ + cav_occ
