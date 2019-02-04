@@ -118,20 +118,20 @@ def main(epsImp, epsCav, U, omega, Lambda, length, tL, tR, sweeps,D):
 
 
     # Michael's stuff
-    L = np.einsum('ijk,ilm->jlkm', L, L.conj())
-    R = np.einsum('ijk,lmk->iljm', R, R.conj())
-
-    dens = np.einsum('ijkl,klmn->imjn', L, R)
-    dummySize = dens.shape[0] * dens.shape[1]
-    dens = np.reshape(dens,(dummySize, dummySize))
+    # L = np.einsum('ijk,ilm->jlkm', L, L.conj())
+    # R = np.einsum('ijk,lmk->iljm', R, R.conj())
+    #
+    # dens = np.einsum('ijkl,klmn->imjn', L, R)
+    # dummySize = dens.shape[0] * dens.shape[1]
+    # dens = np.reshape(dens,(dummySize, dummySize))
 
     # My stuff
     #
-    # dens = np.einsum('jik, klt->jilt', L, R)
-    # dens = np.reshape(dens, (dens.shape[0], dens.shape[1] * dens.shape[2], dens.shape[3]))
-    #
-    # dens = np.einsum('ijk, ilk->jl', dens, dens.conj())
-    #
+    dens = np.einsum('jik, klt->jilt', L, R)
+    dens = np.reshape(dens, (dens.shape[0], dens.shape[1] * dens.shape[2], dens.shape[3]))
+
+    dens = np.einsum('ijk, ilk->jl', dens, dens.conj())
+
 
 
     # Calculate the observables
