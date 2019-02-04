@@ -1,4 +1,5 @@
 from mpi4py import MPI
+import multiprocessing as mp
 from run_settings import import_main_data
 
 # Choose the simulation you want to run
@@ -15,7 +16,9 @@ def split_data(size, data):
 
 def apply_main_in_node(data):
 
-    return [main(*d) for d in data]
+    # return [main(*d) for d in data]
+    p = mp.Pool(mp.cpu_count())
+    return p.starmap(main, data)
 
 
 # MPI setup
