@@ -117,8 +117,7 @@ def main(epsImp, epsCav, U, omega, Lambda, length, tL, tR, sweeps,D):
 
 
     groundState.makeCanonical('Right')
-    groundState.moveGauge(int(length_new / 2) - 1, False, False)
-
+    groundState.moveGauge(int(length_new / 2) + 1, False, False)  # FIXME: get this position right
     L = groundState.M[int(length_new / 2) - 1]
     R = groundState.M[int(length_new / 2)]
 
@@ -129,7 +128,6 @@ def main(epsImp, epsCav, U, omega, Lambda, length, tL, tR, sweeps,D):
     total_dens = np.einsum('ijk, ilk->jl', total_dens, total_dens.conj())
     total_purity = np.real(np.trace(total_dens @ total_dens))
 
-    # FIXME: this is wrong
     dot_dens = np.einsum('ijk, ilk->jl', L, L.conj())
     dot_purity = np.real(np.trace(dot_dens @ dot_dens))
 
