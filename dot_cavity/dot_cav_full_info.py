@@ -4,13 +4,49 @@ import copy
 import numpy as np
 
 
+#
+# def trace_environment(density):
+#     L = len(density.M)
+#
+#     for i in range(0, int(L/2) - 1):
+#         density.M[i] = np.einsum('lddr->lr', density.M[i]) # trace to dot
+#
+#     for i in reversed(range(int(L/2) + 1, L)):
+#         density.M[i] = np.einsum('lddr->lr', density.M[i]) # trace to cavity
+#
+#     return density
+#
+#
+# def contract_in(density):
+#     length = len(density.M)
+#
+#     for i in range(0, int(length/2) - 2):
+#         density.M[i + 1] = np.einsum('ij, jk->ik', density.M[i], density.M[i + 1]) # contract to dot
+#
+#     for i in reversed(range(int(length/2) + 2, length)):
+#         density.M[i - 1] = np.einsum('ij, jk->ik', density.M[i - 1], density.M[i]) # contract to cavity
+#
+#     L = np.einsum('ls, sudr->ludr', density.M[int(length/2) - 2], density.M[int(length/2) - 1])
+#     R = np.einsum('luds, sr->ludr', density.M[int(length/2)], density.M[int(length/2) + 1])
+#
+#     # tmp = np.einsum('luvs, sxyr->luxvyr', L, R).squeeze()
+#     tmp = np.einsum('luvs, sxyr->luvxyr', L, R).squeeze()
+#
+#     tmp_shape = (tmp.shape[0] * tmp.shape[1], tmp.shape[2] * tmp.shape[3])
+#
+#     return  np.reshape(tmp, tmp_shape) # combine dot and cav
+
+
+
+
+
 def main(epsImp, epsCav, D):
 
 
     # define the simulation parameters
     d = 4
     Lambda = 2.0
-    length = 20
+    length = 10
     U = 0.5
     omega = 0.1
     tL, tR = 0.01, 0.01
@@ -75,19 +111,40 @@ def main(epsImp, epsCav, D):
 
     correlation = cov_dot_up_cav_down / (std_dot_up * std_cav_down) + cov_dot_down_cav_up / (std_dot_down * std_cav_up)
 
+    # Old style of getting the purity
+
+    #
+    # density = groundState * groundState.conjugate()
+    # density.structurePhysicalLegs()
+    # reduced_density = trace_environment(density=density)
+    # reduced_density_contracted = contract_in(density=reduced_density)
+    # purity = np.real(np.trace(reduced_density_contracted @ reduced_density_contracted))
+
+
     groundState.makeCanonical('Right')
     groundState.moveGauge(int(length_new / 2), False, False)
 
     L = groundState.M[int(length_new / 2) - 1]
     R = groundState.M[int(length_new / 2)]
 
-    # Michael's stuff
-    L = np.einsum('ijk,ilm->jlkm', L, L.conj())
-    R = np.einsum('ijk,lmk->iljm', R, R.conj())
 
-    dens = np.einsum('ijkl,klmn->imjn',L,R)
-    dummySize = dens.shape[0] * dens.shape[1]
-    dens = np.reshape(dens,(dummySize, dummySize))
+
+    # Michael's stuff
+    # L = np.einsum('ijk,ilm->jlkm', L, L.conj())
+    # R = np.einsum('ijk,lmk->iljm', R, R.conj())
+    #
+    # dens = np.einsum('ijkl,klmn->imjn', L, R)
+    # dummySize = dens.shape[0] * dens.shape[1]
+    # dens = np.reshape(dens,(dummySize, dummySize))
+
+    # My stuff
+
+    dens = np.einsum('jik, klt->jilt', L, R)
+    dens = np.reshape(dens, (dens.shape[0], dens.shape[1] * dens.shape[2], dens.shape[3]))
+
+    dens = np.einsum('ijk, ilk->jl', dens, dens.conj())
+
+
 
     # Calculate the observables
     purity = np.real(np.trace(dens @ dens))
