@@ -14,7 +14,7 @@ rank = comm.Get_rank()  # Identification number of node
 size = comm.Get_size()  # Number of nodes
 
 # Calling main for timing and memory usage
-main(0, 0)
+main(epsImp=0, epsCav=-0.25)
 
 # Stop the timer
 stop = time.time()
