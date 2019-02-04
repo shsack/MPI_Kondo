@@ -4,41 +4,41 @@ import copy
 import numpy as np
 
 
-
-def trace_environment(density):
-    L = len(density.M)
-
-    for i in range(0, int(L/2) - 1):
-        density.M[i] = np.einsum('lddr->lr', density.M[i])  # trace to dot
-
-    for i in reversed(range(int(L/2) + 1, L)):
-        density.M[i] = np.einsum('lddr->lr', density.M[i])  # trace to cavity
-
-    return density
-
-
-def contract_in(density):
-    length = len(density.M)
-
-    for i in range(0, int(length/2) - 2):
-        density.M[i + 1] = np.einsum('ij, jk->ik', density.M[i], density.M[i + 1]) # contract to dot
-
-    for i in reversed(range(int(length/2) + 2, length)):
-        density.M[i - 1] = np.einsum('ij, jk->ik', density.M[i - 1], density.M[i]) # contract to cavity
-
-    L = np.einsum('ls, sudr->ludr', density.M[int(length/2) - 2], density.M[int(length/2) - 1])
-    R = np.einsum('luds, sr->ludr', density.M[int(length/2)], density.M[int(length/2) + 1])
-
-
-    # FIXME: this seems like the issue
-
-    tmp = np.einsum('luvs, sxyr->luxvyr', L, R).squeeze()
-    # tmp = np.einsum('luvs, sxyr->luvxyr', L, R).squeeze()
-
-    tmp_shape = (tmp.shape[0] * tmp.shape[1], tmp.shape[2] * tmp.shape[3])
-
-    return np.reshape(tmp, tmp_shape)  # combine dot and cav
-
+#
+# def trace_environment(density):
+#     L = len(density.M)
+#
+#     for i in range(0, int(L/2) - 1):
+#         density.M[i] = np.einsum('lddr->lr', density.M[i])  # trace to dot
+#
+#     for i in reversed(range(int(L/2) + 1, L)):
+#         density.M[i] = np.einsum('lddr->lr', density.M[i])  # trace to cavity
+#
+#     return density
+#
+#
+# def contract_in(density):
+#     length = len(density.M)
+#
+#     for i in range(0, int(length/2) - 2):
+#         density.M[i + 1] = np.einsum('ij, jk->ik', density.M[i], density.M[i + 1]) # contract to dot
+#
+#     for i in reversed(range(int(length/2) + 2, length)):
+#         density.M[i - 1] = np.einsum('ij, jk->ik', density.M[i - 1], density.M[i]) # contract to cavity
+#
+#     L = np.einsum('ls, sudr->ludr', density.M[int(length/2) - 2], density.M[int(length/2) - 1])
+#     R = np.einsum('luds, sr->ludr', density.M[int(length/2)], density.M[int(length/2) + 1])
+#
+#
+#     # FIXME: this seems like the issue
+#
+#     tmp = np.einsum('luvs, sxyr->luxvyr', L, R).squeeze()
+#     # tmp = np.einsum('luvs, sxyr->luvxyr', L, R).squeeze() # old version
+#
+#     tmp_shape = (tmp.shape[0] * tmp.shape[1], tmp.shape[2] * tmp.shape[3])
+#
+#     return np.reshape(tmp, tmp_shape)  # combine dot and cav
+#
 
 def main(epsImp, epsCav, U, omega, Lambda, length, tL, tR, sweeps,D):
 
@@ -105,33 +105,36 @@ def main(epsImp, epsCav, U, omega, Lambda, length, tL, tR, sweeps,D):
     correlation = cov_dot_up_cav_down / (std_dot_up * std_cav_down) + cov_dot_down_cav_up / (std_dot_down * std_cav_up)
 
     # Old style of getting the purity --> Too memory intensive
-
-    density = groundState * groundState.conjugate()
-    density.structurePhysicalLegs()
-    reduced_density = trace_environment(density=density)
-    reduced_density_contracted = contract_in(density=reduced_density)
-
-    purity = np.real(np.trace(reduced_density_contracted @ reduced_density_contracted))
+    #
+    # density = groundState * groundState.conjugate()
+    # density.structurePhysicalLegs()
+    # reduced_density = trace_environment(density=density)
+    # reduced_density_contracted = contract_in(density=reduced_density)
+    #
+    # purity = np.real(np.trace(reduced_density_contracted @ reduced_density_contracted))
 
     # print(purity)
 
 
-    # groundState.makeCanonical('Right')
-    # groundState.moveGauge(int(length_new / 2), False, False)
-    #
-    # L = groundState.M[int(length_new / 2) - 1]
-    # R = groundState.M[int(length_new / 2)]
+    groundState.makeCanonical('Right')
+    groundState.moveGauge(int(length_new / 2), False, False)
+
+    L = groundState.M[int(length_new / 2) - 1]
+    R = groundState.M[int(length_new / 2)]
 
 
     # My stuff
+    total_dens = np.einsum('jik, klt->jilt', L, R)
+    total_dens = np.reshape(total_dens, (total_dens.shape[0], total_dens.shape[1] * total_dens.shape[2], total_dens.shape[3]))
+    total_dens = np.einsum('ijk, ilk->jl', total_dens, total_dens.conj())
+    total_purity = np.real(np.trace(total_dens @ total_dens))
 
-    # dens = np.einsum('jik, klt->jilt', L, R)
-    # dens = np.reshape(dens, (dens.shape[0], dens.shape[1] * dens.shape[2], dens.shape[3]))
-    # dens = np.einsum('ijk, ilk->jl', dens, dens.conj())
-    # purity = np.real(np.trace(dens @ dens))
-    #
-    # print(purity)
-    #
+    dot_dens = np.einsum('ijk, ilk->jl', L, L.conj())
+    dot_purity = np.real(np.trace(dot_dens @ dot_dens))
+
+    cav_dens = np.einsum('ijk, ilk->jl', R, R.conj())
+    cav_purity = np.real(np.trace(cav_dens @ cav_dens))
+
 
     # Michael's stuff
     # L = np.einsum('ijk,ilm->jlkm', L, L.conj())
@@ -150,5 +153,5 @@ def main(epsImp, epsCav, U, omega, Lambda, length, tL, tR, sweeps,D):
     cav_occ = np.real(groundState.conjugate() * (cav_up + cav_down) * groundState)
     total_occ = dot_occ + cav_occ
 
-    return correlation, purity, total_occ, dot_occ, cav_occ
+    return correlation, total_purity, dot_purity, cav_purity, total_occ, dot_occ, cav_occ
 
