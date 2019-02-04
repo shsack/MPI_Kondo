@@ -111,44 +111,41 @@ def main(epsImp, epsCav, U, omega, Lambda, length, tL, tR, sweeps,D):
     reduced_density = trace_environment(density=density)
     reduced_density_contracted = contract_in(density=reduced_density)
 
-    # purity = np.real(np.trace(reduced_density_contracted @ reduced_density_contracted))
+    purity = np.real(np.trace(reduced_density_contracted @ reduced_density_contracted))
 
-    print(np.real(np.trace(reduced_density_contracted @ reduced_density_contracted)))
+    # print(purity)
 
 
-    groundState.makeCanonical('Right')
-    groundState.moveGauge(int(length_new / 2), False, False)
-
-    L = groundState.M[int(length_new / 2) - 1]
-    R = groundState.M[int(length_new / 2)]
+    # groundState.makeCanonical('Right')
+    # groundState.moveGauge(int(length_new / 2), False, False)
+    #
+    # L = groundState.M[int(length_new / 2) - 1]
+    # R = groundState.M[int(length_new / 2)]
 
 
     # My stuff
 
-    dens = np.einsum('jik, klt->jilt', L, R)
-    dens = np.reshape(dens, (dens.shape[0], dens.shape[1] * dens.shape[2], dens.shape[3]))
-    dens = np.einsum('ijk, ilk->jl', dens, dens.conj())
-    purity = np.real(np.trace(dens @ dens))
-
-    print(purity)
-
+    # dens = np.einsum('jik, klt->jilt', L, R)
+    # dens = np.reshape(dens, (dens.shape[0], dens.shape[1] * dens.shape[2], dens.shape[3]))
+    # dens = np.einsum('ijk, ilk->jl', dens, dens.conj())
+    # purity = np.real(np.trace(dens @ dens))
+    #
+    # print(purity)
+    #
 
     # Michael's stuff
-    L = np.einsum('ijk,ilm->jlkm', L, L.conj())
-    R = np.einsum('ijk,lmk->iljm', R, R.conj())
-
-    dens = np.einsum('ijkl,klmn->imjn', L, R)
-    dummySize = dens.shape[0] * dens.shape[1]
-    dens = np.reshape(dens,(dummySize, dummySize))
-
-    purity = np.real(np.trace(dens @ dens))
-
-    print(purity)
-
-
-
-    exit()
-
+    # L = np.einsum('ijk,ilm->jlkm', L, L.conj())
+    # R = np.einsum('ijk,lmk->iljm', R, R.conj())
+    #
+    # dens = np.einsum('ijkl,klmn->imjn', L, R)
+    # dummySize = dens.shape[0] * dens.shape[1]
+    # dens = np.reshape(dens,(dummySize, dummySize))
+    #
+    # purity = np.real(np.trace(dens @ dens))
+    #
+    # print(purity)
+    #
+    #
     dot_occ = np.real(groundState.conjugate() * (dot_up + dot_down) * groundState)
     cav_occ = np.real(groundState.conjugate() * (cav_up + cav_down) * groundState)
     total_occ = dot_occ + cav_occ
