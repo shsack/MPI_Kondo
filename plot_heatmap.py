@@ -8,23 +8,32 @@ plt.style.use('bmh')
 
 # File to import
 file = 'simulation_results/dot_cav_purity_heatmap.txt'
-
 data = pd.read_csv(file, delimiter=' ', header=None, dtype=float)
 epsImp = list(data[data.columns[0]])
 epsCav = list(data[data.columns[1]])
 
 # Choose the observable as a column of the text file
-num_obs = 3
-observable = list(data[data.columns[num_obs]])
+obs_list = ['correlation', 'total_purity', 'dot_purity', 'cavity_purity',
+            'total_occupation', 'dot_occupation', 'cavity_occupation']
 
-data = data.pivot(index=0, columns=1, values=2).T
+# for observable in obs_list:
+
+# num_obs = int(2 + obs_list.index(observable))
+
+num_obs = 4
+
+observable = obs_list[num_obs - 3]
+
+print(num_obs)
+
+data = data.pivot(index=0, columns=1, values=num_obs)
 extent = [min(epsImp), max(epsImp), min(epsCav), max(epsCav)]
 plt.imshow(data, origin='lower', aspect=1.5, extent=extent)
 
 # Label depending of which observable is plotted
 cbar = plt.colorbar()
-cbar.set_label(r'$\langle n_{d\uparrow} + n_{d\downarrow} \rangle$')
-plt.xlabel(r'$\epsilon_d$')
-plt.ylabel(r'$\epsilon_c$')
+cbar.set_label(r'{}'.format(observable.replace('_', ' ')))
+plt.xlabel(r'$\epsilon_c$')
+plt.ylabel(r'$\epsilon_d$')
 fig = plt.gcf()
-fig.savefig('plots/dot_cav_heatmap.pdf')
+fig.savefig('plots/dot_cav_heatmap_{}.pdf'.format(observable))
