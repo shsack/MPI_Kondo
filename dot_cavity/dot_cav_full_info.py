@@ -9,10 +9,10 @@ def trace_environment(density):
     L = len(density.M)
 
     for i in range(0, int(L/2) - 1):
-        density.M[i] = np.einsum('lddr->lr', density.M[i]) # trace to dot
+        density.M[i] = np.einsum('lddr->lr', density.M[i])  # trace to dot
 
     for i in reversed(range(int(L/2) + 1, L)):
-        density.M[i] = np.einsum('lddr->lr', density.M[i]) # trace to cavity
+        density.M[i] = np.einsum('lddr->lr', density.M[i])  # trace to cavity
 
     return density
 
@@ -29,8 +29,11 @@ def contract_in(density):
     L = np.einsum('ls, sudr->ludr', density.M[int(length/2) - 2], density.M[int(length/2) - 1])
     R = np.einsum('luds, sr->ludr', density.M[int(length/2)], density.M[int(length/2) + 1])
 
-    # tmp = np.einsum('luvs, sxyr->luxvyr', L, R).squeeze()
-    tmp = np.einsum('luvs, sxyr->luvxyr', L, R).squeeze()
+
+    # FIXME: this seems like the issue
+
+    tmp = np.einsum('luvs, sxyr->luxvyr', L, R).squeeze()
+    # tmp = np.einsum('luvs, sxyr->luvxyr', L, R).squeeze()
 
     tmp_shape = (tmp.shape[0] * tmp.shape[1], tmp.shape[2] * tmp.shape[3])
 
@@ -103,11 +106,15 @@ def main(epsImp, epsCav, U, omega, Lambda, length, tL, tR, sweeps,D):
 
     # Old style of getting the purity --> Too memory intensive
 
-    # density = groundState * groundState.conjugate()
-    # density.structurePhysicalLegs()
-    # reduced_density = trace_environment(density=density)
-    # reduced_density_contracted = contract_in(density=reduced_density)
+    density = groundState * groundState.conjugate()
+    density.structurePhysicalLegs()
+    reduced_density = trace_environment(density=density)
+    reduced_density_contracted = contract_in(density=reduced_density)
+
     # purity = np.real(np.trace(reduced_density_contracted @ reduced_density_contracted))
+
+    print(np.real(np.trace(reduced_density_contracted @ reduced_density_contracted)))
+
 
     groundState.makeCanonical('Right')
     groundState.moveGauge(int(length_new / 2), False, False)
@@ -116,26 +123,32 @@ def main(epsImp, epsCav, U, omega, Lambda, length, tL, tR, sweeps,D):
     R = groundState.M[int(length_new / 2)]
 
 
-
-    # Michael's stuff
-    # L = np.einsum('ijk,ilm->jlkm', L, L.conj())
-    # R = np.einsum('ijk,lmk->iljm', R, R.conj())
-    #
-    # dens = np.einsum('ijkl,klmn->imjn', L, R)
-    # dummySize = dens.shape[0] * dens.shape[1]
-    # dens = np.reshape(dens,(dummySize, dummySize))
-
     # My stuff
-    #
+
     dens = np.einsum('jik, klt->jilt', L, R)
     dens = np.reshape(dens, (dens.shape[0], dens.shape[1] * dens.shape[2], dens.shape[3]))
-
     dens = np.einsum('ijk, ilk->jl', dens, dens.conj())
-
-
-
-    # Calculate the observables
     purity = np.real(np.trace(dens @ dens))
+
+    print(purity)
+
+
+    # Michael's stuff
+    L = np.einsum('ijk,ilm->jlkm', L, L.conj())
+    R = np.einsum('ijk,lmk->iljm', R, R.conj())
+
+    dens = np.einsum('ijkl,klmn->imjn', L, R)
+    dummySize = dens.shape[0] * dens.shape[1]
+    dens = np.reshape(dens,(dummySize, dummySize))
+
+    purity = np.real(np.trace(dens @ dens))
+
+    print(purity)
+
+
+
+    exit()
+
     dot_occ = np.real(groundState.conjugate() * (dot_up + dot_down) * groundState)
     cav_occ = np.real(groundState.conjugate() * (cav_up + cav_down) * groundState)
     total_occ = dot_occ + cav_occ
