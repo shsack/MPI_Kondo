@@ -37,19 +37,9 @@ def contract_in(density):
     return np.reshape(tmp, tmp_shape)  # combine dot and cav
 
 
+def main(epsImp, epsCav, U, omega, Lambda, length, tL, tR, sweeps,D):
 
-
-
-def main(epsImp, epsCav, D):
-
-
-    # define the simulation parameters
     d = 4
-    Lambda = 2.0
-    length = 10
-    U = 0.5
-    omega = 0.1
-    tL, tR = 0.01, 0.01
 
     # setting up the Hamiltonian in MPO from
     c = bathCouplings(density='const', N=length, Lambda=Lambda)
@@ -61,7 +51,7 @@ def main(epsImp, epsCav, D):
     H.structuredPhysicalLegs = True
 
     groundState = MPS.mpsDMRG(H, bondDimension=D, thresholdEntanglement=1e-6)
-    groundState.groundState(sweeps=5)
+    groundState.groundState(sweeps=sweeps)
 
     length_new = len(groundState.M)
 
