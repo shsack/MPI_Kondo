@@ -24,7 +24,7 @@ stop = time.time()
 if rank == 0:
     time_for_call = stop - start
     memory_used = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024 ** 2
-    print('Call of main took {0:.2f} seconds.'.format(time_for_call))
+    print('Call of main took {0:.2f} minutes.'.format(time_for_call / 60))
     print('The maximum memory usage was {0:.2f} MB.'.format(memory_used))
 
 
