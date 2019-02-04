@@ -101,31 +101,29 @@ def main(epsImp, epsCav, U, omega, Lambda, length, tL, tR, sweeps,D):
 
     correlation = cov_dot_up_cav_down / (std_dot_up * std_cav_down) + cov_dot_down_cav_up / (std_dot_down * std_cav_up)
 
-    # Old style of getting the purity
+    # Old style of getting the purity --> Too memory intensive
 
+    # density = groundState * groundState.conjugate()
+    # density.structurePhysicalLegs()
+    # reduced_density = trace_environment(density=density)
+    # reduced_density_contracted = contract_in(density=reduced_density)
+    # purity = np.real(np.trace(reduced_density_contracted @ reduced_density_contracted))
 
-    density = groundState * groundState.conjugate()
-    density.structurePhysicalLegs()
-    reduced_density = trace_environment(density=density)
-    reduced_density_contracted = contract_in(density=reduced_density)
-    purity = np.real(np.trace(reduced_density_contracted @ reduced_density_contracted))
+    groundState.makeCanonical('Right')
+    groundState.moveGauge(int(length_new / 2), False, False)
 
-    #
-    # groundState.makeCanonical('Right')
-    # groundState.moveGauge(int(length_new / 2), False, False)
-    #
-    # L = groundState.M[int(length_new / 2) - 1]
-    # R = groundState.M[int(length_new / 2)]
-    #
+    L = groundState.M[int(length_new / 2) - 1]
+    R = groundState.M[int(length_new / 2)]
+
 
 
     # Michael's stuff
-    # L = np.einsum('ijk,ilm->jlkm', L, L.conj())
-    # R = np.einsum('ijk,lmk->iljm', R, R.conj())
-    #
-    # dens = np.einsum('ijkl,klmn->imjn', L, R)
-    # dummySize = dens.shape[0] * dens.shape[1]
-    # dens = np.reshape(dens,(dummySize, dummySize))
+    L = np.einsum('ijk,ilm->jlkm', L, L.conj())
+    R = np.einsum('ijk,lmk->iljm', R, R.conj())
+
+    dens = np.einsum('ijkl,klmn->imjn', L, R)
+    dummySize = dens.shape[0] * dens.shape[1]
+    dens = np.reshape(dens,(dummySize, dummySize))
 
     # My stuff
     #
@@ -137,7 +135,7 @@ def main(epsImp, epsCav, U, omega, Lambda, length, tL, tR, sweeps,D):
 
 
     # Calculate the observables
-    # purity = np.real(np.trace(dens @ dens))
+    purity = np.real(np.trace(dens @ dens))
     dot_occ = np.real(groundState.conjugate() * (dot_up + dot_down) * groundState)
     cav_occ = np.real(groundState.conjugate() * (cav_up + cav_down) * groundState)
     total_occ = dot_occ + cav_occ
