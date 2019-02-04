@@ -1,7 +1,6 @@
 from mpi4py import MPI
 import time
 import resource
-import sys
 from run_settings import import_main_data
 simulation_name = 'dot_cav_purity_heatmap'
 _, main = import_main_data(which_simulation=simulation_name)
