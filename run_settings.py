@@ -5,7 +5,7 @@ from itertools import product
 
 def import_main_data(which_simulation):
 
-    if which_simulation == 'dot_cav_purity_heatmap':
+    if which_simulation == 'dot_cav_heatmap':
 
         from dot_cavity.dot_cav_full_info import main
 
