@@ -115,25 +115,29 @@ def main(epsImp, epsCav, U, omega, Lambda, length, tL, tR, sweeps,D):
 
     # print(purity)
 
+    middle = int(length_new / 2)
 
     groundState.makeCanonical('Right')
-    groundState.moveGauge(int(length_new / 2) + 1, False, False)  # FIXME: get this position right
-    L = groundState.M[int(length_new / 2) - 1]
-    R = groundState.M[int(length_new / 2)]
+    groundState.moveGauge(middle - 1, False, False)
 
-
-    # My stuff
-    total_dens = np.einsum('jik, klt->jilt', L, R)
-    total_dens = np.reshape(total_dens, (total_dens.shape[0], total_dens.shape[1] * total_dens.shape[2], total_dens.shape[3]))
-    total_dens = np.einsum('ijk, ilk->jl', total_dens, total_dens.conj())
-    total_purity = np.real(np.trace(total_dens @ total_dens))
+    L = groundState.M[middle - 1]
+    R = groundState.M[middle]
 
     dot_dens = np.einsum('ijk, ilk->jl', L, L.conj())
     dot_purity = np.real(np.trace(dot_dens @ dot_dens))
 
+    total_dens = np.einsum('jik, klt->jilt', L, R)
+    total_dens = np.reshape(total_dens,
+                            (total_dens.shape[0], total_dens.shape[1] * total_dens.shape[2], total_dens.shape[3]))
+
+    total_dens = np.einsum('ijk, ilk->jl', total_dens, total_dens.conj())
+    total_purity = np.real(np.trace(total_dens @ total_dens))
+
+    groundState.makeCanonical('Right')  # Not sure why you have to redo this
+    groundState.moveGauge(middle, False, False)
+    R = groundState.M[middle]
     cav_dens = np.einsum('ijk, ilk->jl', R, R.conj())
     cav_purity = np.real(np.trace(cav_dens @ cav_dens))
-
 
     # Michael's stuff
     # L = np.einsum('ijk,ilm->jlkm', L, L.conj())
