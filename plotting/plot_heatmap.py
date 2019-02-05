@@ -19,7 +19,7 @@ obs_list = ['correlation', 'total_purity', 'dot_purity', 'cavity_purity',
 for i, observable in enumerate(obs_list):
 
     # File to import
-    file = 'simulation_results/dot_cav_heatmap.txt'
+    file = '../simulation_results/dot_cav_heatmap.txt'
     data = pd.read_csv(file, delimiter=' ', header=None, dtype=float)
     epsImp = list(data[data.columns[0]])
     epsCav = list(data[data.columns[1]])
