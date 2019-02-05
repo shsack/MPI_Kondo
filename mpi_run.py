@@ -49,12 +49,8 @@ if rank == 0:
     for res in result:
         for res_i in res:
             myRes.append(res_i)
-    if simulation_name == simulation_list[0]:
+
         for dat_, res_ in zip(data, myRes):
             f.write(' '.join(map(str, dat_)) + " " + ' '.join(map(str, res_)) + '\n')
-    else:
-        for dat_, res_ in zip(data, myRes):
-            f.write(str(dat_) + " " + str(res_) + '\n')
-
     f.close()
 
