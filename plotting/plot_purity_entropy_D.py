@@ -10,9 +10,8 @@ plt.style.use('bmh')
 simulation_name = 'purity_entropy_D'
 file = '../simulation_results/{}.txt'.format(simulation_name)
 data = pd.read_csv(file, delimiter=' ', header=None, dtype=float)
-D = list(data[data.columns[0]])
-purity = list(data[data.columns[1]])
-entropy = list(data[data.columns[2]])
+data = data.sort_values(by=0)
+D, purity, entropy = data[0], data[1], data[2]
 
 # Label depending of which observable is plotted
 plt.plot(D, purity, linestyle='-', color='seagreen', label=r'Purity $Tr(\rho^{2})$')
