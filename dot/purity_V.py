@@ -18,13 +18,7 @@ def setup(epsImp, U, V, Lambda, length, D, sweeps):
     return groundState
 
 
-def main(V, D):
-
-    U = 0.5
-    epsImp = -U/2
-    Lambda = 2.0
-    length = 20
-    sweeps = 10
+def main(D, V, epsImp, U, Lambda, length, sweeps):
 
     groundState = setup(epsImp=epsImp, U=U, V=V, Lambda=Lambda, length=length, D=D, sweeps=sweeps)
     groundState.makeCanonical('Right')
@@ -32,4 +26,4 @@ def main(V, D):
     dens = np.einsum('ijk, lmk', tmp, tmp.conj()).squeeze()
     purity = np.real(np.trace(dens @ dens))
 
-    return purity
+    return (purity, )
